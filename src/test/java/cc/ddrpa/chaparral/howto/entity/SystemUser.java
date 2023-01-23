@@ -1,8 +1,7 @@
-package cc.ddrpa.chaparral.entity;
+package cc.ddrpa.chaparral.howto.entity;
 
-
-import cc.ddrpa.chaparral.CustomAddressHandler;
 import cc.ddrpa.chaparral.annotation.Sensitive;
+import cc.ddrpa.chaparral.howto.CustomAddressHandler;
 
 import static cc.ddrpa.chaparral.enums.DesensitizeStrategy.*;
 

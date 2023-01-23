@@ -11,9 +11,9 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
 import java.util.Objects;
 
-public class DesensitizeSerializer extends StdSerializer<Object> implements ContextualSerializer {
-    private static final String DEFAULT_MASK = "******";
+import static cc.ddrpa.chaparral.Constant.DEFAULT_MASK;
 
+public class DesensitizeSerializer extends StdSerializer<Object> implements ContextualSerializer {
     public IDesensitizer getDesensitizer() {
         return desensitizer;
     }

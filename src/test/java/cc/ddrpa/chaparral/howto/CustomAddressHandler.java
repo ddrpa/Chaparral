@@ -1,18 +1,17 @@
-package cc.ddrpa.chaparral;
+package cc.ddrpa.chaparral.howto;
 
 import cc.ddrpa.chaparral.desensitizer.IDesensitizer;
-import cc.ddrpa.chaparral.entity.Address;
-import org.junit.jupiter.api.Test;
+import cc.ddrpa.chaparral.howto.entity.Address;
 
 public class CustomAddressHandler implements IDesensitizer<Address> {
     /**
-     * this handler should replace all numbers in address detail with *
+     * It should replace all numbers in address detail with *
      *
-     * @param valueObject
-     * @return
+     * @param valueObject the address object
+     * @return desensitized address object
      */
     public Address desensitize(Address valueObject) {
-        String desensitizedAddressDetail = valueObject.getDetail().replaceAll("[^0-9]+", "*");
+        String desensitizedAddressDetail = valueObject.getDetail().replaceAll("[0-9]+", "*");
         return new Address(valueObject.getProvince(),
                 valueObject.getCity(),
                 desensitizedAddressDetail,
