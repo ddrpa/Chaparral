@@ -2,11 +2,14 @@
 
 Chaparral is a data desensitize helper designed to work with FasterXML/Jackson.
 
-「欉（cóng，音同丛）」是一款配合 FasterXML/Jackson 使用的数据脱敏工具。
+「欉（cóng，音同丛）」是一款配合 FasterXML/Jackson 使用的数据脱敏工具，通过为敏感数据属性添加注解实现在
+JSON 序列化过程中脱敏。
 
-## How to use
+## 添加依赖
 
-添加依赖：
+本项目制品通过 sonatype.org 同步到 Maven
+中央仓库，可以访问 [MvnRepository](https://mvnrepository.com/artifact/cc.ddrpa/chaparral)
+获取最新的正式版本。
 
 ```xml
 <dependency>
@@ -16,49 +19,76 @@ Chaparral is a data desensitize helper designed to work with FasterXML/Jackson.
 </dependency>
 ```
 
-snapshot 版本可以在 [sonatype.org](https://s01.oss.sonatype.org/#nexus-search;quick~cc.ddrpa) 查找。
+预览版本可以在添加 snapshots
+源后通过 [sonatype.org](https://s01.oss.sonatype.org/#nexus-search;quick~cc.ddrpa)
+查找最新版本。
 
 ```xml
+
 <repositories>
-    <repository>
-        <id>snapshots</id>
-        <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
-    </repository>
+  <repository>
+    <id>snapshots</id>
+    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+  </repository>
 </repositories>
 ```
 
-在类的属性上添加 `cc.ddrpa.chaparral.annotation.Sensitive` 注解，使用 Jackson 序列化为 JSON 字符串时会应用脱敏规则。
+## 使用方法
+
+在 Result Bean 的属性上添加 `cc.ddrpa.chaparral.annotation.Sensitive` 注解，使用
+Jackson 序列化为 JSON 字符串时会自动应用脱敏规则。
 
 ```java
 public class SystemUserVO {
-    @Sensitive(strategy = DesensitizeStrategy.BANK_ACCOUNT)
-    private String bankAccount;
-    @Sensitive(strategy = DesensitizeStrategy.CUSTOM, using = cc.ddrpa.chaparral.howto.CustomAddressHandler.class)
-    private Address address;
-    @Sensitive
+  // 应用预设的几种脱敏规则
+  @Sensitive(strategy = DesensitizeStrategy.BANK_ACCOUNT)
+  private String bankAccount;
+  // 可以编写自定义规则
+  @Sensitive(strategy = DesensitizeStrategy.CUSTOM, using = cc.ddrpa.chaparral.howto.CustomAddressHandler.class)
+  private Address address;
+  // 默认使用 nulling out 规则
+  @Sensitive
     private Integer fieldShouldBeNullingOut;
 }
 ```
 
-输出如下：
+典型输出如下：
 
-```text
+```json
 {
-    "realName": "张*三",
-    "idCard": "3****************3",
-    "bankAccount": "622307******9940",
-    "email": "n***y@ddrpa.cc",
-    "mobile": "188****9941",
-    "address": {
-        "province": "浙江省",
-        "city": "杭州市",
-        "detail": "西湖区桃源岭*号",
-        "zipCode": "310001"
-    },
-    "fieldShouldBeNullingOut": null
+  "realName": "张*三",
+  "idCard": "3****************3",
+  "bankAccount": "622307******9940",
+  "email": "n***y@ddrpa.cc",
+  "mobile": "188****9941",
+  "address": {
+    "province": "浙江省",
+    "city": "杭州市",
+    "detail": "西湖区桃源岭*号",
+    "zipCode": "310001"
+  },
+  "fieldShouldBeNullingOut": null
 }
 ```
 
+### 预置脱敏规则
+
+| 脱敏策略         | 应用场景           | 脱敏规则                          | 示例                 |
+|--------------|----------------|-------------------------------|--------------------|
+| BANK_ACCOUNT | 银行卡号           | 保留前6后4，中间用「*」代替，总长 16         | 622307******9940   |
+| CELL         | 手机号码           | 保留前3后4，中间使用「*」代替              | 188****9941        |
+| EMAIL        | 电子邮件地址         | 保留用户名部分的第一个和最后一个字符，以及电子邮箱域名   | n***y@ddrpa.cc     |
+| ID_CARD      | 中华人民共和国居民身份证号码 | 保留前1后1，共18位，用「*」填充            | 3****************3 |
+| NAME         | 中文姓名           | 无论原长多少，保留第一个字和最后一个字，中间添加一个「*」 | 张*三                |
+
+### 自定义脱敏规则
+
+自定义脱敏规则 `DesensitizeStrategy.CUSTOM`
+需要实现 `cc.ddrpa.chaparral.desensitizer.IDesensitizer`
+接口，然后在 `@Sensitive` 注解中使用 `using` 属性引用该类。
+
 ## 下一步计划
 
-- 支持脱敏后转换成其他类型，例如 `java.time.LocalDate.of(2023, 1, 23)` 转换成字符串 `2023/**/**`。
+- 目前对各类数据的异常情况（如位数不对等）没有统一做符合直觉的处理，考虑允许用户自行注入异常处理逻辑；
+- 支持脱敏后转换成其他类型，例如 `java.time.LocalDate.of(2023, 1, 23)`
+  转换成字符串 `2023/**/**`；
