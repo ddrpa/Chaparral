@@ -5,5 +5,5 @@ package cc.ddrpa.chaparral.desensitizer;
  * @param <T> type of the value it desensitizes
  */
 public interface IDesensitizer<T> {
-    T desensitize(T value);
+    Object desensitize(T value);
 }

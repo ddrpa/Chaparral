@@ -10,6 +10,10 @@ public enum DesensitizeStrategy {
      */
     BANK_ACCOUNT,
     /**
+     * 出生日期脱敏，年份用「****」代替，使用 yyyy-MM-dd Pattern
+     */
+    BIRTHDAY,
+    /**
      * 中国大陆地区移动电话号码脱敏，保留前3后4，中间使用「*」代替
      */
     CELL,

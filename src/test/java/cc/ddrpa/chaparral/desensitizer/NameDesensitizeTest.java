@@ -37,5 +37,4 @@ class NameDesensitizeTest {
                 "{\"name\":null}",
                 mapper.writeValueAsString(new ChineseName(null)));
     }
-
 }

@@ -19,14 +19,16 @@ public class DesensitizerFactory {
         }
         return strategyMap.computeIfAbsent(strategy, strategyAsKey -> {
             switch (strategyAsKey) {
-                case ID_CARD:
-                    return new IDCardMaskingDesensitizer();
                 case BANK_ACCOUNT:
                     return new BankAccountMaskingDesensitizer();
-                case EMAIL:
-                    return new EmailAddressMaskingDesensitizer();
+                case BIRTHDAY:
+                    return new BirthdayMaskingDesensitizer();
                 case CELL:
                     return new CellPhoneNumberMaskingDesensitizer();
+                case EMAIL:
+                    return new EmailAddressMaskingDesensitizer();
+                case ID_CARD:
+                    return new IDCardMaskingDesensitizer();
                 case NAME:
                     return new NameMaskingDesensitizer();
                 default:
